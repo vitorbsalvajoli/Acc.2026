@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Expressões Aritméticas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 18px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-clear {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .result-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-title {
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: 32px;
+            color: #667eea;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .steps {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .step {
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            padding: 15px;
+            background: #fde8e8;
+            border-radius: 8px;
+        }
+
+        .examples {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .examples h3 {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .example-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 5px;
+            background: #e8eaf6;
+            color: #667eea;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .example-btn:hover {
+            background: #c5cae9;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 Calculadora de Expressões</h1>
+        <p class="subtitle">Digite sua expressão aritmética e veja o resultado passo a passo</p>
+
+        <div class="input-group">
+            <label for="expression">Expressão:</label>
+            <input 
+                type="text" 
+                id="expression" 
+                placeholder="Ex: 90-120*30/50"
+                autocomplete="off"
+            >
+        </div>
+
+        <div class="buttons">
+            <button class="btn-calculate" onclick="calculate()">Calcular</button>
+            <button class="btn-clear" onclick="clearAll()">Limpar</button>
+        </div>
+
+        <div id="resultSection" class="result-section hidden">
+            <div class="result-title">Resultado:</div>
+            <div id="resultValue" class="result-value"></div>
+            <div id="stepsSection" class="steps">
+                <div class="result-title">Passo a passo:</div>
+                <div id="steps"></div>
+            </div>
+        </div>
+
+        <div id="errorSection" class="error hidden"></div>
+
+        <div class="examples">
+            <h3>Exemplos (clique para usar):</h3>
+            <button class="example-btn" onclick="useExample('90-120*30/50')">90-120*30/50</button>
+            <button class="example-btn" onclick="useExample('(10+5)*2')">（10+5）*2</button>
+            <button class="example-btn" onclick="useExample('100/4+25')">100/4+25</button>
+            <button class="example-btn" onclick="useExample('2^10')">2^10</button>
+            <button class="example-btn" onclick="useExample('15+3*8-20/4')">15+3*8-20/4</button>
+        </div>
+    </div>
+
+    <script>
+        // Função principal de cálculo
+        function calculate() {
+            const expressionInput = document.getElementById('expression').value.trim();
+            const resultSection = document.getElementById('resultSection');
+            const errorSection = document.getElementById('errorSection');
+            const resultValue = document.getElementById('resultValue');
+            const stepsDiv = document.getElementById('steps');
+
+            // Limpar resultados anteriores
+            resultSection.classList.add('hidden');
+            errorSection.classList.add('hidden');
+
+            if (!expressionInput) {
+                showError('Por favor, digite uma expressão.');
+                return;
+            }
+
+            try {
+                // Validar expressão
+                validateExpression(expressionInput);
+
+                // Converter expressão para formato JavaScript
+                let jsExpression = convertExpression(expressionInput);
+
+                // Gerar passos da resolução
+                const steps = generateSteps(expressionInput);
+
+                // Calcular resultado
+                const result = eval(jsExpression);
+
+                // Formatar resultado
+                const formattedResult = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
+
+                // Exibir resultado
+                resultValue.textContent = formattedResult;
+
+                // Exibir passos
+                stepsDiv.innerHTML = steps.map(step => 
+                    `<div class="step">${step}</div>`
+                ).join('');
+
+                resultSection.classList.remove('hidden');
+
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Validar expressão
+        function validateExpression(expr) {
+            // Verificar caracteres válidos
+            const validChars = /^[\d\s\+\-\*\/\^\(\)\.]+$/;
+            if (!validChars.test(expr)) {
+                throw new Error('Expressão contém caracteres inválidos. Use apenas números e operadores (+, -, *, /, ^, parênteses).');
+            }
+
+            // Verificar parênteses balanceados
+            let parenCount = 0;
+            for (let char of expr) {
+                if (char === '(') parenCount++;
+                if (char === ')') parenCount--;
+                if (parenCount < 0) {
+                    throw new Error('Parênteses desbalanceados.');
+                }
+            }
+            if (parenCount !== 0) {
+                throw new Error('Parênteses desbalanceados.');
+            }
+
+            // Verificar operadores consecutivos inválidos
+            if (/[\+\-\*\/]{2,}/.test(expr.replace(/\s/g, ''))) {
+                throw new Error('Operadores consecutivos inválidos.');
+            }
+        }
+
+        // Converter expressão para JavaScript
+        function convertExpression(expr) {
+            // Substituir ^ por ** (potência em JavaScript)
+            return expr.replace(/\^/g, '**');
+        }
+
+        // Gerar passos da resolução
+        function generateSteps(expr) {
+            const steps = [];
+            steps.push(`<strong>Expressão original:</strong> ${expr}`);
+
+            // Converter ^ para potência
+            if (expr.includes('^')) {
+                steps.push(`<strong>Converter potência:</strong> ${expr.replace(/\^/g, '**')}`);
+            }
+
+            steps.push(`<strong>Aplicar ordem das operações (PEMDAS):</strong>`);
+            steps.push(`1. Parênteses`);
+            steps.push(`2. Expoentes/Potências`);
+            steps.push(`3. Multiplicação e Divisão (esquerda para direita)`);
+            steps.push(`4. Adição e Subtração (esquerda para direita)`);
+
+            const result = eval(convertExpression(expr));
+            steps.push(`<strong>Resultado final:</strong> ${Number.isInteger(result) ? result : parseFloat(result.toFixed(6))}`);
+
+            return steps;
+        }
+
+        // Exibir erro
+        function showError(message) {
+            const errorSection = document.getElementById('errorSection');
+            errorSection.textContent = `❌ ${message}`;
+            errorSection.classList.remove('hidden');
+        }
+
+        // Limpar tudo
+        function clearAll() {
+            document.getElementById('expression').value = '';
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('errorSection').classList.add('hidden');
+            document.getElementById('expression').focus();
+        }
+
+        // Usar exemplo
+        function useExample(expr) {
+            document.getElementById('expression').value = expr;
+            calculate();
+        }
+
+        // Calcular ao pressionar Enter
+        document.getElementById('expression').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculate();
+            }
+        });
+
+        // Focar no input ao carregar
+        window.onload = function() {
+            document.getElementById('expression').focus();
+        };
+    </script>
+</body>
+</html>
