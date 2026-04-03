@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmácia do André - Sua saúde em primeiro lugar</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">🏥</span>
+                <h1>Farmácia do André</h1>
+            </div>
+            <div class="header-actions">
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Buscar medicamentos...">
+                    <button class="search-btn" onclick="buscarProduto()">🔍</button>
+                </div>
+                <button class="cart-btn" onclick="toggleCarrinho()">
+                    🛒 Carrinho
+                    <span class="cart-count" id="cart-count">0</span>
+                </button>
+                <button class="cart-btn" onclick="toggleMeusPedidos()" style="background: var(--accent-color);">
+                    📋 Meus Pedidos
+                </button>
+                <button class="cart-btn" id="btn-usuario" onclick="gerenciarConta()" style="background: var(--primary-color);">
+                    👤 Entrar
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegação -->
+    <nav class="nav">
+        <div class="container">
+            <ul class="nav-list">
+                <li><a href="#" class="active" onclick="filtrarCategoria('todos')">Todos</a></li>
+                <li><a href="#" onclick="filtrarCategoria('analgésicos')">Analgésicos</a></li>
+                <li><a href="#" onclick="filtrarCategoria('antibióticos')">Antibióticos</a></li>
+                <li><a href="#" onclick="filtrarCategoria('vitaminas')">Vitaminas</a></li>
+                <li><a href="#" onclick="filtrarCategoria('cuidados-pessoais')">Cuidados Pessoais</a></li>
+                <li><a href="#" onclick="filtrarCategoria('infantil')">Infantil</a></li>
+                <li><a href="#" onclick="filtrarCategoria('cronico')">Uso Crônico</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Banner Principal -->
+    <section class="banner">
+        <div class="container">
+            <div class="banner-content">
+                <h2>Ofertas Especiais</h2>
+                <p>Descontos de até 40% em vitaminas e suplementos!</p>
+                <button class="btn-banner" onclick="filtrarCategoria('vitaminas')">Ver Ofertas</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lista de Produtos -->
+    <main class="main">
+        <div class="container">
+            <h2 class="section-title">Nossos Produtos</h2>
+            <div class="products-grid" id="products-grid">
+                <!-- Produtos serão carregados via JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal do Carrinho -->
+    <div class="cart-modal" id="cart-modal">
+        <div class="cart-overlay" onclick="toggleCarrinho()"></div>
+        <div class="cart-content">
+            <div class="cart-header">
+                <h3>🛒 Seu Carrinho</h3>
+                <button class="close-btn" onclick="toggleCarrinho()">✕</button>
+            </div>
+            <div class="cart-items" id="cart-items">
+                <!-- Itens do carrinho serão carregados via JavaScript -->
+                <p class="empty-cart">Seu carrinho está vazio</p>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span class="total-value" id="cart-total">R$ 0,00</span>
+                </div>
+                <div class="cart-actions">
+                    <button class="btn-clear" onclick="limparCarrinho()">Limpar Carrinho</button>
+                    <button class="btn-checkout" onclick="finalizarCompra()">Finalizar Compra</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Finalização -->
+    <div class="checkout-modal" id="checkout-modal">
+        <div class="checkout-overlay" onclick="fecharCheckout()"></div>
+        <div class="checkout-content">
+            <div class="checkout-header">
+                <h3>📋 Finalizar Pedido</h3>
+                <button class="close-btn" onclick="fecharCheckout()">✕</button>
+            </div>
+            <form class="checkout-form" id="checkout-form" onsubmit="confirmarPedido(event)">
+                <div class="form-group">
+                    <label for="nome">Nome Completo *</label>
+                    <input type="text" id="nome" required placeholder="Digite seu nome">
+                </div>
+                <div class="form-group">
+                    <label for="telefone">Telefone *</label>
+                    <input type="tel" id="telefone" required placeholder="(00) 00000-0000">
+                </div>
+                <div class="form-group">
+                    <label for="cpf">CPF *</label>
+                    <input type="text" id="cpf" required placeholder="000.000.000-00">
+                </div>
+                <div class="form-group">
+                    <label for="cep">CEP *</label>
+                    <input type="text" id="cep" required placeholder="00000-000">
+                </div>
+                <div class="form-group">
+                    <label for="endereco">Endereço *</label>
+                    <input type="text" id="endereco" required placeholder="Rua, número">
+                </div>
+                <div class="form-group">
+                    <label for="complemento">Complemento</label>
+                    <input type="text" id="complemento" placeholder="Ex: esquina, portão branco, apto 101">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cidade">Cidade *</label>
+                        <input type="text" id="cidade" required placeholder="Sua cidade">
+                    </div>
+                    <div class="form-group">
+                        <label for="estado">Estado *</label>
+                        <select id="estado" required>
+                            <option value="">UF</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="PR">Paraná</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="BA">Bahia</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="pagamento">Forma de Pagamento *</label>
+                    <select id="pagamento" required onchange="mostrarCampoTroco()">
+                        <option value="">Selecione...</option>
+                        <option value="pix">PIX (5% de desconto)</option>
+                        <option value="cartao_credito">Cartão de Crédito</option>
+                        <option value="cartao_debito">Cartão de Débito</option>
+                        <option value="dinheiro">Dinheiro (na entrega)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="grupo-troco" style="display: none;">
+                    <label for="valor-troco">Valor para troco *</label>
+                    <input type="text" id="valor-troco" placeholder="R$ 0,00" oninput="calcularTroco()">
+                    <small id="troco-info" style="color: var(--primary-color); font-size: 0.85rem;"></small>
+                </div>
+                <div class="checkout-summary">
+                    <h4>Resumo do Pedido</h4>
+                    <div id="checkout-items"></div>
+                    <div id="desconto-pix" style="display: none; color: var(--success-color); padding: 8px 0; font-size: 0.9rem;">
+                        💠 Desconto PIX (5%): <span id="desconto-pix-value">- R$ 0,00</span>
+                    </div>
+                    <div class="checkout-total">
+                        <span id="checkout-total-label">Total:</span>
+                        <span id="checkout-total-value">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="termos" required>
+                    <label for="termos">Concordo com os termos e condições e declaro que os medicamentos são para uso pessoal.</label>
+                </div>
+                <button type="submit" class="btn-confirm">Confirmar Pedido</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Meus Pedidos -->
+    <div class="cart-modal" id="meus-pedidos-modal">
+        <div class="cart-overlay" onclick="toggleMeusPedidos()"></div>
+        <div class="cart-content">
+            <div class="cart-header">
+                <h3>📋 Meus Pedidos</h3>
+                <button class="close-btn" onclick="toggleMeusPedidos()">✕</button>
+            </div>
+            <div class="cart-items" style="padding: 20px;">
+                <!-- Área para usuário não logado -->
+                <div id="area-login-pedidos">
+                    <p style="color: var(--text-light); text-align: center; margin-bottom: 15px;">Faça login para ver seus pedidos automaticamente</p>
+                    <button class="btn-checkout" onclick="gerenciarConta()" style="width: 100%; margin-bottom: 15px;">
+                        👤 Fazer Login
+                    </button>
+                    <p style="color: var(--text-light); font-size: 0.85rem; text-align: center;">ou</p>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label for="consulta-cpf">Consultar por CPF</label>
+                        <input type="text" id="consulta-cpf" placeholder="000.000.000-00" oninput="formatarCPFConsulta(event)">
+                    </div>
+                    <button class="btn-checkout" onclick="consultarPedidos()" style="width: 100%; margin-top: 10px;">
+                        🔍 Consultar Pedidos
+                    </button>
+                </div>
+                <div id="pedidos-consulta" style="margin-top: 20px;">
+                    <!-- Pedidos do cliente aparecerão aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="confirmation-modal" id="confirmation-modal">
+        <div class="confirmation-content">
+            <div class="confirmation-icon">✅</div>
+            <h3>Pedido Confirmado!</h3>
+            <p>Seu pedido foi recebido com sucesso.</p>
+            <p class="order-number">Número do pedido: <strong id="order-number"></strong></p>
+            <p>Entraremos em contato pelo telefone informado.</p>
+            <button class="btn-close" onclick="fecharConfirmacao()">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Farmácia do André</h4>
+                    <p>Cuidando da sua saúde com carinho e dedicação.</p>
+                    <p>CRF: 12345-6</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contato</h4>
+                    <p>📞 (17) 3245-2992</p>
+                    <p>📍 Av. Nove de Julho, 1381</p>
+                    <p>🏙️ José Bonifácio - SP | CEP: 15200-000</p>
+                    <p>📸 @farmaciadoandre</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Horário de Atendimento</h4>
+                    <p>Segunda a Sexta: 7h às 22h</p>
+                    <p>Sábado: 8h às 20h</p>
+                    <p>Domingo: 8h às 14h</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Farmácia do André. Todos os direitos reservados.</p>
+                <p>Os medicamentos podem causar efeitos colaterais. Consulte seu médico ou farmacêutico.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

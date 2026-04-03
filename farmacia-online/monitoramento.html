@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoramento de Pedidos - Farmácia do André</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .monitoramento-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .monitoramento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .monitoramento-header h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--success-color);
+            color: var(--white);
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--white);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-card.pending .stat-value { color: var(--warning-color); }
+        .stat-card.preparing .stat-value { color: var(--secondary-color); }
+        .stat-card.ready .stat-value { color: var(--success-color); }
+        .stat-card.delivering .stat-value { color: var(--accent-color); }
+        .stat-card.delivered .stat-value { color: var(--primary-color); }
+
+        .pedidos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+        }
+
+        .pedido-card {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .pedido-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .pedido-card.priority {
+            border: 2px solid var(--accent-color);
+        }
+
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pedido-id {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        .pedido-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-pendente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-preparando {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-pronto {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-saindo_entrega {
+            background: #fff3cd;
+            color: #856404;
+            animation: pulseStatus 2s infinite;
+        }
+
+        @keyframes pulseStatus {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .status-entregue {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .pedido-body {
+            padding: 15px 20px;
+        }
+
+        .pedido-info {
+            margin-bottom: 12px;
+        }
+
+        .pedido-info label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .pedido-info span {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .pedido-info.farmacutico {
+            background: var(--bg-light);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pedido-info.farmacutico .farmaceutico-icon {
+            font-size: 1.2rem;
+        }
+
+        .pedido-itens {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+
+        .pedido-itens h4 {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .pedido-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 0.9rem;
+        }
+
+        .pedido-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 15px 20px;
+            background: var(--bg-light);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pedido-total {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .pedido-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-action.aceitar {
+            background: var(--success-color);
+            color: var(--white);
+        }
+
+        .btn-action.aceitar:hover { background: #218838; }
+
+        .btn-preparar {
+            background: var(--secondary-color);
+            color: var(--white);
+        }
+
+        .btn-preparar:hover { background: #0052a3; }
+
+        .btn-pronto {
+            background: var(--success-color);
+            color: var(--white);
+        }
+
+        .btn-pronto:hover { background: #218838; }
+
+        .btn-entregar {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-entregar:hover { background: var(--primary-dark); }
+
+        .btn-excluir {
+            background: var(--danger-color);
+            color: var(--white);
+        }
+
+        .btn-excluir:hover { background: #c82333; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .btn-refresh {
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-refresh:hover {
+            background: var(--primary-dark);
+        }
+
+        .filtro-status {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filtro-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            background: var(--white);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .filtro-btn:hover,
+        .filtro-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .sound-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .sound-toggle.muted {
+            opacity: 0.5;
+        }
+
+        .sound-toggle.ativo {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .sound-toggle.inativo {
+            background: var(--danger-color);
+            color: white;
+            border-color: var(--danger-color);
+        }
+
+        #recebendo-toggle {
+            bottom: 80px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.aberta {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .status-badge.fechada {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        /* Modal de login do farmacêutico */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-content .form-group {
+            margin-bottom: 15px;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .modal-content input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn-modal {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-modal:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-cancel {
+            background: var(--text-light);
+            margin-top: 10px;
+        }
+
+        .btn-cancel:hover {
+            background: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">🏥</span>
+                <h1>Farmácia do André - Monitoramento</h1>
+            </div>
+            <div class="header-info">
+                <span id="status-loja" class="status-badge aberta">
+                    🟢 Loja Aberta
+                </span>
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    Ao Vivo
+                </div>
+                <button class="btn-refresh" onclick="carregarPedidos()">
+                    🔄 Atualizar
+                </button>
+                <a href="index.html" class="btn-refresh">
+                    🛒 Site
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="monitoramento-container">
+        <div class="monitoramento-header" style="box-shadow: none; background: transparent; padding: 0;">
+            <div>
+                <h1>📋 Monitoramento de Pedidos</h1>
+                <p style="color: var(--text-light); margin-top: 5px;">Acompanhe todos os pedidos em tempo real</p>
+            </div>
+        </div>
+
+        <div class="stats-cards">
+            <div class="stat-card pending">
+                <h3>⏳ Pendentes</h3>
+                <div class="stat-value" id="stat-pendentes">0</div>
+            </div>
+            <div class="stat-card preparing">
+                <h3>📦 Preparando</h3>
+                <div class="stat-value" id="stat-preparando">0</div>
+            </div>
+            <div class="stat-card ready">
+                <h3>✅ Prontos</h3>
+                <div class="stat-value" id="stat-prontos">0</div>
+            </div>
+            <div class="stat-card delivering">
+                <h3>🚚 Saiu para Entrega</h3>
+                <div class="stat-value" id="stat-saindo">0</div>
+            </div>
+            <div class="stat-card delivered">
+                <h3>✅ Entregues</h3>
+                <div class="stat-value" id="stat-entregues">0</div>
+            </div>
+        </div>
+
+        <div class="filtro-status">
+            <button class="filtro-btn active" onclick="filtrarPedidos('todos')">Todos</button>
+            <button class="filtro-btn" onclick="filtrarPedidos('pendente')">Pendentes</button>
+            <button class="filtro-btn" onclick="filtrarPedidos('preparando')">Preparando</button>
+            <button class="filtro-btn" onclick="filtrarPedidos('pronto')">Prontos</button>
+            <button class="filtro-btn" onclick="filtrarPedidos('saindo_entrega')">Saindo para Entrega</button>
+            <button class="filtro-btn" onclick="filtrarPedidos('entregue')">Entregues</button>
+        </div>
+
+        <div class="pedidos-grid" id="pedidos-grid">
+            <!-- Pedidos serão carregados aqui -->
+        </div>
+
+        <div class="empty-state" id="empty-state" style="display: none;">
+            <h3>📭 Nenhum pedido encontrado</h3>
+            <p>Os pedidos feitos no site aparecerão aqui automaticamente.</p>
+        </div>
+    </main>
+
+    <!-- Botão para abrir/fechar loja -->
+    <div class="sound-toggle ativo" id="recebendo-toggle" onclick="toggleLoja()" title="Abrir/Fechar loja para clientes">
+        🟢
+    </div>
+
+    <!-- Botão para ativar/desativar som -->
+    <div class="sound-toggle" id="sound-toggle" onclick="toggleSound()" title="Ativar/Desativar som">
+        🔔
+    </div>
+
+    <!-- Modal de login do farmacêutico -->
+    <div class="modal-overlay" id="modal-farmaceutico">
+        <div class="modal-content">
+            <h3>👨‍⚕️ Login do Farmacêutico</h3>
+            <p style="text-align: center; color: var(--text-light); margin-bottom: 20px; font-size: 0.9rem;">
+                ${acaoPendente ? 'Informe suas credenciais para executar a ação' : 'Faça login para gerenciar a loja'}
+            </p>
+            <div class="form-group">
+                <label for="codigo-farmaceutico">Código do Farmacêutico *</label>
+                <input type="text" id="codigo-farmaceutico" placeholder="Ex: FAR001">
+            </div>
+            <div class="form-group">
+                <label for="senha-farmaceutico">Senha *</label>
+                <input type="password" id="senha-farmaceutico" placeholder="Sua senha">
+            </div>
+            <button class="btn-modal" onclick="confirmarAcaoFarmaceutico()">Entrar</button>
+            <button class="btn-modal btn-cancel" onclick="fecharModalFarmaceutico()">Cancelar</button>
+        </div>
+    </div>
+
+    <script>
+        let pedidos = [];
+        let filtroAtual = 'todos';
+        let somAtivado = true;
+        let ultimoPedidoId = null;
+        let lojaAberta = true;
+        let notificationPermission = false;
+        let acaoPendente = null;
+        let farmaceuticoLogado = null;
+
+        // Lista de farmacêuticos cadastrados (em produção viria do banco de dados)
+        const farmaceuticosCadastrados = [
+            { codigo: 'FAR001', nome: 'Dr. André', senha: '123456' },
+            { codigo: 'FAR002', nome: 'Dra. Maria', senha: '123456' },
+            { codigo: 'FAR003', nome: 'Dr. João', senha: '123456' },
+            { codigo: 'ADMIN', nome: 'Administrador', senha: 'admin123' }
+        ];
+
+        // Carregar pedidos ao iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar se farmacêutico está logado
+            const farmaceuticoSalvo = localStorage.getItem('farmaceuticoLogado');
+            if (farmaceuticoSalvo) {
+                farmaceuticoLogado = JSON.parse(farmaceuticoSalvo);
+            }
+            
+            // Solicitar permissão para notificações
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    notificationPermission = permission === 'granted';
+                });
+            }
+            
+            // Carregar status da loja
+            const statusLoja = localStorage.getItem('lojaAbertaFarmacia');
+            if (statusLoja !== null) {
+                lojaAberta = statusLoja === 'true';
+                atualizarStatusLoja();
+            }
+            
+            carregarPedidos();
+            // Atualizar automaticamente a cada 3 segundos (mais frequente)
+            setInterval(carregarPedidos, 3000);
+            // Verificar pedidos para entrega automática a cada minuto
+            setInterval(verificarPedidosEntregues, 60000);
+            // Escutar mudanças no localStorage
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'pedidosFarmacia') {
+                    carregarPedidos();
+                }
+                if (e.key === 'lojaAbertaFarmacia') {
+                    lojaAberta = e.newValue === 'true';
+                    atualizarStatusLoja();
+                }
+            });
+            // Manter página ativa mesmo em segundo plano
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    carregarPedidos();
+                }
+            });
+            
+            // Atualizar botão de login do farmacêutico
+            atualizarBotaoFarmaceutico();
+        });
+
+        function carregarPedidos() {
+            const pedidosSalvos = localStorage.getItem('pedidosFarmacia');
+            if (pedidosSalvos) {
+                const novosPedidos = JSON.parse(pedidosSalvos);
+                
+                // Verificar se há novo pedido
+                if (novosPedidos.length > 0 && ultimoPedidoId !== novosPedidos[0].id) {
+                    const novoPedido = novosPedidos[0];
+                    
+                    // Se loja estiver aberta, notificar
+                    if (lojaAberta) {
+                        if (somAtivado) {
+                            tocarNotificacao();
+                        }
+                        
+                        // Enviar notificação do sistema
+                        if (notificationPermission) {
+                            new Notification('Novo Pedido - Farmácia do André', {
+                                body: `Pedido ${novoPedido.id} de ${novoPedido.nome}\nTotal: ${novoPedido.total}`,
+                                icon: '🏥',
+                                tag: novoPedido.id,
+                                requireInteraction: true
+                            });
+                        }
+                    }
+                    
+                    ultimoPedidoId = novoPedido.id;
+                }
+                
+                pedidos = novosPedidos;
+                renderizarPedidos();
+                atualizarEstatisticas();
+            } else {
+                pedidos = [];
+                renderizarPedidos();
+                atualizarEstatisticas();
+            }
+        }
+
+        function renderizarPedidos() {
+            const grid = document.getElementById('pedidos-grid');
+            const emptyState = document.getElementById('empty-state');
+
+            let pedidosFiltrados = pedidos;
+            if (filtroAtual !== 'todos') {
+                pedidosFiltrados = pedidos.filter(p => p.status === filtroAtual);
+            }
+
+            if (pedidosFiltrados.length === 0) {
+                grid.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            grid.innerHTML = pedidosFiltrados.map(pedido => `
+                <div class="pedido-card ${pedido.status === 'pendente' ? 'priority' : ''}">
+                    <div class="pedido-header">
+                        <span class="pedido-id">${pedido.id}</span>
+                        <span class="pedido-status status-${pedido.status}">${formatarStatus(pedido.status)}</span>
+                    </div>
+                    <div class="pedido-body">
+                        <div class="pedido-info">
+                            <label>Cliente</label>
+                            <span>${pedido.nome}</span>
+                        </div>
+                        <div class="pedido-info">
+                            <label>Telefone</label>
+                            <span>${pedido.telefone}</span>
+                        </div>
+                        <div class="pedido-info">
+                            <label>Endereço</label>
+                            <span>${pedido.endereco}${pedido.complemento ? ' - ' + pedido.complemento : ''}, ${pedido.cidade}-${pedido.estado}</span>
+                        </div>
+                        <div class="pedido-info">
+                            <label>Pagamento</label>
+                            <span>${formatarPagamento(pedido.pagamento)}</span>
+                        </div>
+                        ${pedido.pagamento === 'dinheiro' ? `
+                        <div class="pedido-info">
+                            <label>Valor para Troco</label>
+                            <span>${pedido.valorTroco || 'N/A'}</span>
+                        </div>
+                        ` : ''}
+                        ${pedido.farmaceuticoPreparacao ? `
+                        <div class="pedido-info farmaceutico">
+                            <span class="farmaceutico-icon">👨‍⚕️</span>
+                            <span><strong>Preparado por:</strong> ${pedido.farmaceuticoPreparacao}</span>
+                        </div>
+                        ` : ''}
+                        ${pedido.farmaceuticoDespacho ? `
+                        <div class="pedido-info farmaceutico">
+                            <span class="farmaceutico-icon">🚚</span>
+                            <span><strong>Despachado por:</strong> ${pedido.farmaceuticoDespacho}</span>
+                        </div>
+                        ` : ''}
+                        <div class="pedido-itens">
+                            <h4>📦 Itens do Pedido</h4>
+                            ${pedido.itens.map(item => `
+                                <div class="pedido-item">
+                                    <span>${item.emoji} ${item.nome} x${item.quantidade}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="pedido-footer">
+                        <span class="pedido-total">Total: ${pedido.total}</span>
+                        <div class="pedido-actions">
+                            ${pedido.status === 'pendente' ? `
+                                <button class="btn-action aceitar" onclick="acaoComFarmaceutico('aceitar', '${pedido.id}')">
+                                    ✅ Aceitar
+                                </button>
+                                <button class="btn-action btn-preparar" onclick="acaoComFarmaceutico('preparar', '${pedido.id}')">
+                                    📦 Preparar
+                                </button>
+                            ` : ''}
+                            ${pedido.status === 'preparando' ? `
+                                <button class="btn-action btn-pronto" onclick="acaoComFarmaceutico('pronto', '${pedido.id}')">
+                                    ✅ Pronto
+                                </button>
+                            ` : ''}
+                            ${pedido.status === 'pronto' ? `
+                                <button class="btn-action btn-entregar" onclick="acaoComFarmaceutico('saindo', '${pedido.id}')">
+                                    🚚 Saiu para Entrega
+                                </button>
+                            ` : ''}
+                            ${pedido.status === 'saindo_entrega' ? `
+                                <button class="btn-action btn-entregar" onclick="acaoComFarmaceutico('entregar', '${pedido.id}')">
+                                    ✅ Confirmar Entrega
+                                </button>
+                            ` : ''}
+                            <button class="btn-action btn-excluir" onclick="excluirPedido('${pedido.id}')">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Função para abrir modal de identificação do farmacêutico
+        function acaoComFarmaceutico(acao, pedidoId) {
+            // Se já estiver logado, executa direto
+            if (farmaceuticoLogado) {
+                executarAcaoComFarmaceutico(acao, pedidoId, farmaceuticoLogado.codigo);
+                return;
+            }
+            
+            // Se não, abre modal de login
+            acaoPendente = { acao, pedidoId };
+            abrirModalLoginFarmaceutico();
+        }
+
+        function abrirModalLoginFarmaceutico() {
+            document.getElementById('modal-farmaceutico').classList.add('active');
+            document.getElementById('codigo-farmaceutico').value = '';
+            document.getElementById('senha-farmaceutico').value = '';
+            document.getElementById('codigo-farmaceutico').focus();
+        }
+
+        // Confirmar login do farmacêutico
+        function confirmarAcaoFarmaceutico() {
+            const codigo = document.getElementById('codigo-farmaceutico').value.trim().toUpperCase();
+            const senha = document.getElementById('senha-farmaceutico').value;
+            
+            if (!codigo) {
+                alert('Por favor, informe o código do farmacêutico!');
+                return;
+            }
+            
+            // Buscar farmacêutico na lista
+            const farmaceutico = farmaceuticosCadastrados.find(f => f.codigo === codigo);
+            
+            if (!farmaceutico) {
+                alert('Código de farmacêutico não encontrado!');
+                return;
+            }
+            
+            if (farmaceutico.senha !== senha) {
+                alert('Senha incorreta!');
+                return;
+            }
+            
+            // Logar farmacêutico
+            farmaceuticoLogado = farmaceutico;
+            localStorage.setItem('farmaceuticoLogado', JSON.stringify(farmaceutico));
+            atualizarBotaoFarmaceutico();
+            
+            // Se houver ação pendente, executa
+            if (acaoPendente) {
+                executarAcaoComFarmaceutico(acaoPendente.acao, acaoPendente.pedidoId, codigo);
+                acaoPendente = null;
+            } else {
+                mostrarNotificacao(`✅ Farmacêutico ${farmaceutico.nome} logado com sucesso!`);
+            }
+            
+            fecharModalFarmaceutico();
+        }
+
+        // Executar ação após identificar farmacêutico
+        function executarAcaoComFarmaceutico(acao, pedidoId, codigoFarmaceutico) {
+            const pedidoIndex = pedidos.findIndex(p => p.id === pedidoId);
+            if (pedidoIndex === -1) return;
+            
+            const acaoMap = {
+                'aceitar': { status: 'preparando', titulo: 'Pedido Aceito', msg: `Farmacêutico ${codigoFarmaceutico} aceitou o pedido ${pedidoId}` },
+                'preparar': { status: 'preparando', titulo: 'Início da Preparação', msg: `Farmacêutico ${codigoFarmaceutico} iniciou preparação do pedido ${pedidoId}` },
+                'pronto': { status: 'pronto', titulo: 'Pedido Pronto', msg: `Farmacêutico ${codigoFarmaceutico} concluiu preparação do pedido ${pedidoId}` },
+                'saindo': { status: 'saindo_entrega', titulo: 'Saiu para Entrega', msg: `Farmacêutico ${codigoFarmaceutico} despachou pedido ${pedidoId}` },
+                'entregar': { status: 'entregue', titulo: 'Pedido Entregue', msg: `Farmacêutico ${codigoFarmaceutico} confirmou entrega do pedido ${pedidoId}` }
+            };
+            
+            const acaoInfo = acaoMap[acao];
+            if (!acaoInfo) return;
+            
+            pedidos[pedidoIndex].status = acaoInfo.status;
+            pedidos[pedidoIndex].dataAtualizacao = new Date().toISOString();
+            
+            // Campos específicos por ação
+            switch(acao) {
+                case 'aceitar':
+                    pedidos[pedidoIndex].dataAceitacao = new Date().toISOString();
+                    pedidos[pedidoIndex].farmaceuticoAceitacao = codigoFarmaceutico;
+                    break;
+                case 'preparar':
+                    pedidos[pedidoIndex].farmaceuticoPreparacao = codigoFarmaceutico;
+                    pedidos[pedidoIndex].dataInicioPreparacao = new Date().toISOString();
+                    break;
+                case 'pronto':
+                    pedidos[pedidoIndex].farmaceuticoPreparacao = codigoFarmaceutico;
+                    pedidos[pedidoIndex].dataConclusaoPreparacao = new Date().toISOString();
+                    break;
+                case 'saindo':
+                    pedidos[pedidoIndex].farmaceuticoDespacho = codigoFarmaceutico;
+                    pedidos[pedidoIndex].dataSaiuEntrega = new Date().toISOString();
+                    break;
+                case 'entregar':
+                    pedidos[pedidoIndex].farmaceuticoDespacho = codigoFarmaceutico;
+                    pedidos[pedidoIndex].dataEntrega = new Date().toISOString();
+                    break;
+            }
+            
+            // Salvar log da ação
+            salvarLog({
+                tipo: 'farmaceutico',
+                titulo: acaoInfo.titulo,
+                detalhes: acaoInfo.msg,
+                data: new Date().toISOString()
+            });
+            
+            localStorage.setItem('pedidosFarmacia', JSON.stringify(pedidos));
+            carregarPedidos();
+            mostrarNotificacao(`${acaoInfo.titulo} por ${codigoFarmaceutico}`);
+        }
+
+        function fecharModalFarmaceutico() {
+            document.getElementById('modal-farmaceutico').classList.remove('active');
+            document.getElementById('codigo-farmaceutico').value = '';
+            document.getElementById('senha-farmaceutico').value = '';
+            acaoPendente = null;
+        }
+
+        function logoutFarmaceutico() {
+            if (confirm('Deseja sair da conta do farmacêutico?')) {
+                farmaceuticoLogado = null;
+                localStorage.removeItem('farmaceuticoLogado');
+                atualizarBotaoFarmaceutico();
+                mostrarNotificacao('Farmacêutico deslogado.');
+            }
+        }
+
+        function atualizarBotaoFarmaceutico() {
+            const headerInfo = document.querySelector('.header-info');
+            let botaoFarmaceutico = document.getElementById('btn-farmaceutico');
+            
+            if (farmaceuticoLogado) {
+                if (!botaoFarmaceutico) {
+                    botaoFarmaceutico = document.createElement('button');
+                    botaoFarmaceutico.id = 'btn-farmaceutico';
+                    botaoFarmaceutico.className = 'btn-refresh';
+                    botaoFarmaceutico.style.background = 'var(--accent-color)';
+                    headerInfo.insertBefore(botaoFarmaceutico, headerInfo.firstChild);
+                }
+                botaoFarmaceutico.textContent = `👨‍⚕️ ${farmaceuticoLogado.nome}`;
+                botaoFarmaceutico.onclick = logoutFarmaceutico;
+            } else {
+                if (!botaoFarmaceutico) {
+                    botaoFarmaceutico = document.createElement('button');
+                    botaoFarmaceutico.id = 'btn-farmaceutico';
+                    botaoFarmaceutico.className = 'btn-refresh';
+                    botaoFarmaceutico.style.background = 'var(--secondary-color)';
+                    headerInfo.insertBefore(botaoFarmaceutico, headerInfo.firstChild);
+                }
+                botaoFarmaceutico.textContent = '👨‍⚕️ Login Farmácia';
+                botaoFarmaceutico.onclick = abrirModalLoginFarmaceutico;
+            }
+        }
+
+        // Toggle abrir/fechar loja
+        function toggleLoja() {
+            // Verificar se farmacêutico está logado
+            if (!farmaceuticoLogado) {
+                alert('É necessário estar logado como farmacêutico para abrir/fechar a loja!');
+                abrirModalLoginFarmaceutico();
+                return;
+            }
+            
+            lojaAberta = !lojaAberta;
+            localStorage.setItem('lojaAbertaFarmacia', lojaAberta);
+            atualizarStatusLoja();
+            
+            // Salvar log
+            const acao = lojaAberta ? 'ABERTA' : 'FECHADA';
+            salvarLog({
+                tipo: 'loja',
+                titulo: `Loja ${acao}`,
+                detalhes: `Farmacêutico ${farmaceuticoLogado.codigo} (${farmaceuticoLogado.nome}) ${lojaAberta ? 'abriu' : 'fechou'} a loja para clientes`,
+                data: new Date().toISOString()
+            });
+            
+            if (lojaAberta) {
+                mostrarNotificacao(`🟢 Loja ABERTA por ${farmaceuticoLogado.nome} - Clientes podem fazer pedidos`);
+            } else {
+                mostrarNotificacao(`🔴 Loja FECHADA por ${farmaceuticoLogado.nome} - Clientes não podem fazer pedidos`);
+            }
+        }
+
+        function atualizarStatusLoja() {
+            const statusBadge = document.getElementById('status-loja');
+            const btnToggle = document.getElementById('recebendo-toggle');
+            
+            if (lojaAberta) {
+                statusBadge.className = 'status-badge aberta';
+                statusBadge.textContent = '🟢 Loja Aberta';
+                btnToggle.className = 'sound-toggle ativo';
+                btnToggle.textContent = '🟢';
+            } else {
+                statusBadge.className = 'status-badge fechada';
+                statusBadge.textContent = '🔴 Loja Fechada';
+                btnToggle.className = 'sound-toggle inativo';
+                btnToggle.textContent = '🔴';
+            }
+        }
+
+        function toggleSound() {
+            somAtivado = !somAtivado;
+            const btn = document.getElementById('sound-toggle');
+            btn.classList.toggle('muted', !somAtivado);
+            btn.textContent = somAtivado ? '🔔' : '🔕';
+        }
+
+        function filtrarPedidos(filtro) {
+            filtroAtual = filtro;
+            document.querySelectorAll('.filtro-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase().includes(filtro === 'todos' ? 'todos' : filtro)) {
+                    btn.classList.add('active');
+                }
+            });
+            renderizarPedidos();
+        }
+
+        function atualizarEstatisticas() {
+            document.getElementById('stat-pendentes').textContent = pedidos.filter(p => p.status === 'pendente').length;
+            document.getElementById('stat-preparando').textContent = pedidos.filter(p => p.status === 'preparando').length;
+            document.getElementById('stat-prontos').textContent = pedidos.filter(p => p.status === 'pronto').length;
+            document.getElementById('stat-saindo').textContent = pedidos.filter(p => p.status === 'saindo_entrega').length;
+            document.getElementById('stat-entregues').textContent = pedidos.filter(p => p.status === 'entregue').length;
+        }
+
+        function formatarStatus(status) {
+            const statusMap = {
+                'pendente': 'Pendente',
+                'preparando': 'Preparando',
+                'pronto': 'Pronto',
+                'saindo_entrega': 'Saindo para Entrega',
+                'entregue': 'Entregue'
+            };
+            return statusMap[status] || status;
+        }
+
+        function formatarPagamento(pagamento) {
+            const pagamentoMap = {
+                'pix': '💠 PIX (5% desconto)',
+                'cartao_credito': '💳 Cartão de Crédito',
+                'cartao_debito': '💳 Cartão de Débito',
+                'dinheiro': '💵 Dinheiro (na entrega)'
+            };
+            return pagamentoMap[pagamento] || pagamento;
+        }
+
+        // Verificar pedidos que devem ser marcados como entregues automaticamente
+        function verificarPedidosEntregues() {
+            const agora = new Date();
+            let atualizou = false;
+            
+            pedidos.forEach(pedido => {
+                if (pedido.status === 'saindo_entrega' && pedido.dataSaiuEntrega) {
+                    const dataSaiu = new Date(pedido.dataSaiuEntrega);
+                    const diferencaMs = agora - dataSaiu;
+                    const diferencaHoras = diferencaMs / (1000 * 60 * 60);
+                    
+                    if (diferencaHoras >= 1) {
+                        pedido.status = 'entregue';
+                        pedido.dataEntrega = agora.toISOString();
+                        pedido.entregaAutomatica = true;
+                        atualizou = true;
+                    }
+                }
+            });
+            
+            if (atualizou) {
+                localStorage.setItem('pedidosFarmacia', JSON.stringify(pedidos));
+                carregarPedidos();
+            }
+        }
+
+        function tocarNotificacao() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.value = 0.3;
+
+            oscillator.start();
+            
+            setTimeout(() => {
+                oscillator.frequency.value = 1000;
+            }, 150);
+
+            setTimeout(() => {
+                oscillator.stop();
+            }, 300);
+        }
+
+        function excluirPedido(pedidoId) {
+            if (confirm(`Deseja realmente excluir o pedido ${pedidoId}?`)) {
+                pedidos = pedidos.filter(p => p.id !== pedidoId);
+                localStorage.setItem('pedidosFarmacia', JSON.stringify(pedidos));
+                carregarPedidos();
+                mostrarNotificacao(`Pedido ${pedidoId} excluído`);
+            }
+        }
+
+        function mostrarNotificacao(mensagem) {
+            const toast = document.createElement('div');
+            toast.className = 'toast success';
+            toast.textContent = mensagem;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 140px;
+                right: 20px;
+                background: var(--success-color);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: var(--shadow-hover);
+                z-index: 1003;
+                animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Sistema de logs
+        function salvarLog(log) {
+            const logs = JSON.parse(localStorage.getItem('logsFarmacia') || '[]');
+            logs.push(log);
+            // Manter apenas últimos 1000 logs
+            if (logs.length > 1000) {
+                logs.splice(0, logs.length - 1000);
+            }
+            localStorage.setItem('logsFarmacia', JSON.stringify(logs));
+        }
+
+        // Tecla Enter no modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.getElementById('modal-farmaceutico').classList.contains('active')) {
+                confirmarAcaoFarmaceutico();
+            }
+            if (e.key === 'Escape') {
+                fecharModalFarmaceutico();
+            }
+        });
+    </script>
+</body>
+</html>
