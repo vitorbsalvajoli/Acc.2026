@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Farmácia do André</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 20px;
+        }
+
+        .auth-box {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .auth-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .auth-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            font-size: 1rem;
+        }
+
+        .auth-tab:hover {
+            color: var(--primary-color);
+        }
+
+        .auth-tab.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .auth-form {
+            padding: 30px;
+        }
+
+        .auth-form-content {
+            display: none;
+        }
+
+        .auth-form-content.active {
+            display: block;
+        }
+
+        .auth-form .form-group {
+            margin-bottom: 18px;
+        }
+
+        .auth-form label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .auth-form input,
+        .auth-form select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .auth-form input:focus,
+        .auth-form select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-auth {
+            width: 100%;
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-auth:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-auth:active {
+            transform: translateY(0);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-voltar-site {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--white);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+
+        .btn-voltar-site:hover {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .logo-farmacia {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .logo-farmacia span {
+            font-size: 2.5rem;
+        }
+
+        .logo-farmacia h1 {
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle input {
+            padding-right: 45px;
+        }
+
+        .password-toggle .toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-light);
+        }
+
+        .password-toggle .toggle-btn:hover {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <div class="logo-farmacia">
+                    <span>🏥</span>
+                    <h1>Farmácia do André</h1>
+                </div>
+                <p>Cuide da sua saúde com conforto</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="mudarAba('login')">Login</button>
+                <button class="auth-tab" onclick="mudarAba('registro')">Criar Conta</button>
+            </div>
+
+            <div class="auth-form">
+                <!-- Formulário de Login -->
+                <div id="form-login" class="auth-form-content active">
+                    <form onsubmit="fazerLogin(event)">
+                        <div class="form-group">
+                            <label for="login-email">E-mail *</label>
+                            <input type="email" id="login-email" required placeholder="seu@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="login-senha">Senha *</label>
+                            <div class="password-toggle">
+                                <input type="password" id="login-senha" required placeholder="Sua senha">
+                                <button type="button" class="toggle-btn" onclick="toggleSenha('login-senha', this)">👁️</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-auth">Entrar</button>
+                    </form>
+                    <div class="auth-footer">
+                        <p>Esqueceu a senha? <a href="#" onclick="alert('Entre em contato: (17) 3245-2992')">Recuperar</a></p>
+                    </div>
+                </div>
+
+                <!-- Formulário de Registro -->
+                <div id="form-registro" class="auth-form-content">
+                    <form onsubmit="fazerRegistro(event)">
+                        <div class="form-group">
+                            <label for="registro-nome">Nome Completo *</label>
+                            <input type="text" id="registro-nome" required placeholder="Digite seu nome">
+                        </div>
+                        <div class="form-group">
+                            <label for="registro-email">E-mail *</label>
+                            <input type="email" id="registro-email" required placeholder="seu@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="registro-senha">Senha *</label>
+                            <div class="password-toggle">
+                                <input type="password" id="registro-senha" required placeholder="Mínimo 6 caracteres" minlength="6">
+                                <button type="button" class="toggle-btn" onclick="toggleSenha('registro-senha', this)">👁️</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="registro-cpf">CPF *</label>
+                            <input type="text" id="registro-cpf" required placeholder="000.000.000-00">
+                        </div>
+                        <div class="form-group">
+                            <label for="registro-telefone">Telefone *</label>
+                            <input type="tel" id="registro-telefone" required placeholder="(00) 00000-0000">
+                        </div>
+                        <div class="form-group">
+                            <label for="registro-cep">CEP *</label>
+                            <input type="text" id="registro-cep" required placeholder="00000-000">
+                        </div>
+                        <div class="form-group">
+                            <label for="registro-endereco">Endereço *</label>
+                            <input type="text" id="registro-endereco" required placeholder="Rua, número">
+                        </div>
+                        <div class="form-group">
+                            <label for="registro-complemento">Complemento</label>
+                            <input type="text" id="registro-complemento" placeholder="Apto, bloco, etc.">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="registro-cidade">Cidade *</label>
+                                <input type="text" id="registro-cidade" required placeholder="Sua cidade">
+                            </div>
+                            <div class="form-group">
+                                <label for="registro-estado">Estado *</label>
+                                <select id="registro-estado" required>
+                                    <option value="">UF</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="RS">Rio Grande do Sul</option>
+                                    <option value="PR">Paraná</option>
+                                    <option value="SC">Santa Catarina</option>
+                                    <option value="BA">Bahia</option>
+                                    <option value="PE">Pernambuco</option>
+                                    <option value="DF">Distrito Federal</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-auth">Criar Conta</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mudar entre abas
+        function mudarAba(aba) {
+            document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.auth-form-content').forEach(content => content.classList.remove('active'));
+
+            if (aba === 'login') {
+                document.querySelector('.auth-tab:first-child').classList.add('active');
+                document.getElementById('form-login').classList.add('active');
+            } else {
+                document.querySelector('.auth-tab:last-child').classList.add('active');
+                document.getElementById('form-registro').classList.add('active');
+            }
+        }
+
+        // Toggle visibilidade senha
+        function toggleSenha(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🔒';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
+        }
+
+        // Máscara CPF
+        document.getElementById('registro-cpf').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            if (value.length > 9) {
+                value = `${value.slice(0, 3)}.${value.slice(3, 6)}.${value.slice(6, 9)}-${value.slice(9)}`;
+            } else if (value.length > 6) {
+                value = `${value.slice(0, 3)}.${value.slice(3, 6)}.${value.slice(6)}-${value.slice(9)}`;
+            } else if (value.length > 3) {
+                value = `${value.slice(0, 3)}.${value.slice(3)}-${value.slice(6)}`;
+            }
+            e.target.value = value;
+        });
+
+        // Máscara telefone
+        document.getElementById('registro-telefone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            if (value.length > 10) {
+                value = `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7, 11)}`;
+            } else if (value.length > 5) {
+                value = `(${value.slice(0, 2)}) ${value.slice(2, 6)}-${value.slice(6, 10)}`;
+            } else if (value.length > 2) {
+                value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+            }
+            e.target.value = value;
+        });
+
+        // Máscara CEP e busca automática
+        document.getElementById('registro-cep').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 8) value = value.slice(0, 8);
+            if (value.length > 5) {
+                value = `${value.slice(0, 5)}-${value.slice(5)}`;
+            }
+            e.target.value = value;
+
+            if (value.replace(/\D/g, '').length === 8) {
+                buscarCepRegistro(value.replace(/\D/g, ''));
+            }
+        });
+
+        function buscarCepRegistro(cep) {
+            const enderecoInput = document.getElementById('registro-endereco');
+            const cidadeInput = document.getElementById('registro-cidade');
+            const estadoSelect = document.getElementById('registro-estado');
+
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.erro) {
+                        cidadeInput.value = data.localidade;
+                        estadoSelect.value = data.uf;
+                        enderecoInput.value = data.logradouro;
+                        enderecoInput.focus();
+                    }
+                })
+                .catch(() => {});
+        }
+
+        // Fazer registro
+        function fazerRegistro(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('registro-email').value.trim().toLowerCase();
+            const senha = document.getElementById('registro-senha').value;
+
+            // Verificar se email já existe
+            const usuarios = JSON.parse(localStorage.getItem('usuariosFarmacia') || '[]');
+            if (usuarios.find(u => u.email === email)) {
+                alert('Este e-mail já está cadastrado!');
+                return;
+            }
+
+            // Criar novo usuário
+            const novoUsuario = {
+                nome: document.getElementById('registro-nome').value.trim(),
+                email: email,
+                senha: senha,
+                cpf: document.getElementById('registro-cpf').value.trim(),
+                telefone: document.getElementById('registro-telefone').value.trim(),
+                cep: document.getElementById('registro-cep').value.trim(),
+                endereco: document.getElementById('registro-endereco').value.trim(),
+                complemento: document.getElementById('registro-complemento').value.trim(),
+                cidade: document.getElementById('registro-cidade').value.trim(),
+                estado: document.getElementById('registro-estado').value,
+                dataCadastro: new Date().toISOString()
+            };
+
+            // Salvar usuário
+            usuarios.push(novoUsuario);
+            localStorage.setItem('usuariosFarmacia', JSON.stringify(usuarios));
+
+            // Fazer login automático
+            localStorage.setItem('usuarioLogadoFarmacia', JSON.stringify({
+                email: novoUsuario.email,
+                nome: novoUsuario.nome
+            }));
+
+            alert('Conta criada com sucesso!');
+            window.location.href = 'index.html';
+        }
+
+        // Fazer login
+        function fazerLogin(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const senha = document.getElementById('login-senha').value;
+
+            const usuarios = JSON.parse(localStorage.getItem('usuariosFarmacia') || '[]');
+            const usuario = usuarios.find(u => u.email === email && u.senha === senha);
+
+            if (usuario) {
+                localStorage.setItem('usuarioLogadoFarmacia', JSON.stringify({
+                    email: usuario.email,
+                    nome: usuario.nome
+                }));
+                window.location.href = 'index.html';
+            } else {
+                alert('E-mail ou senha inválidos!');
+            }
+        }
+
+        // Verificar se já está logado
+        window.addEventListener('DOMContentLoaded', () => {
+            const usuarioLogado = localStorage.getItem('usuarioLogadoFarmacia');
+            if (usuarioLogado) {
+                if (confirm('Você já está logado. Deseja ir para a página principal?')) {
+                    window.location.href = 'index.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

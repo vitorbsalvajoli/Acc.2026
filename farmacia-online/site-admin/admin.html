@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração - Farmácia do André</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .admin-header {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+
+        .admin-header h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .admin-nav-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--white);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .admin-nav-btn:hover,
+        .admin-nav-btn.active {
+            background: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .dash-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .dash-card h3 {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        .dash-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .dash-card .trend {
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .dash-card .trend.up { color: var(--success-color); }
+        .dash-card .trend.down { color: var(--danger-color); }
+
+        .logs-table {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .logs-table h3 {
+            padding: 20px;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logs-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 15px;
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .log-icon.pedido { background: #e3f2fd; }
+        .log-icon.farmaceutico { background: #f3e5f5; }
+        .log-icon.loja { background: #e8f5e9; }
+        .log-icon.sistema { background: #fff3e0; }
+
+        .log-content {
+            flex: 1;
+        }
+
+        .log-content .title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .log-content .details {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .log-time {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            white-space: nowrap;
+        }
+
+        .farmaceuticos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .farmaceutico-card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .farmaceutico-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .farmaceutico-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .farmaceutico-info h3 {
+            margin-bottom: 5px;
+        }
+
+        .farmaceutico-info .codigo {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .farmaceutico-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .fs-stat {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .fs-stat .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .fs-stat .label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .vendas-chart {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+
+        .vendas-chart h3 {
+            margin-bottom: 20px;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            height: 200px;
+            padding: 20px 0;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: var(--primary-color);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            min-height: 5px;
+            transition: height 0.5s;
+        }
+
+        .chart-bar:hover {
+            background: var(--primary-dark);
+        }
+
+        .chart-bar .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .chart-bar .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-light);
+        }
+
+        .recent-pedidos {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .recent-pedidos h3 {
+            padding: 20px;
+            background: var(--bg-light);
+        }
+
+        .pedido-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 1fr 1fr 100px;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .pedido-row:hover {
+            background: var(--bg-light);
+        }
+
+        .pedido-row.header {
+            font-weight: 600;
+            background: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-dot.pendente { background: var(--warning-color); }
+        .status-dot.preparando { background: var(--secondary-color); }
+        .status-dot.pronto { background: var(--success-color); }
+        .status-dot.saindo { background: var(--accent-color); }
+        .status-dot.entregue { background: #9e9e9e; }
+
+        .btn-export {
+            background: var(--success-color);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-export:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">🏥</span>
+                <h1>Farmácia do André - Administração</h1>
+            </div>
+            <div class="header-actions">
+                <a href="monitoramento.html" class="btn-refresh" style="background: var(--secondary-color);">
+                    📋 Monitoramento
+                </a>
+                <a href="index.html" class="btn-refresh">
+                    🛒 Site
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-container">
+        <div class="admin-header">
+            <h1>📊 Painel Administrativo</h1>
+            <p style="color: var(--text-light); margin-top: 5px;">Visão completa de todas as operações da farmácia</p>
+        </div>
+
+        <div class="admin-nav">
+            <button class="admin-nav-btn active" onclick="mostrarSecao('dashboard')">📈 Dashboard</button>
+            <button class="admin-nav-btn" onclick="mostrarSecao('logs')">📋 Logs de Atividades</button>
+            <button class="admin-nav-btn" onclick="mostrarSecao('farmaceuticos')">👨‍⚕️ Farmacêuticos</button>
+            <button class="admin-nav-btn" onclick="mostrarSecao('vendas')">💰 Vendas</button>
+            <button class="admin-nav-btn" onclick="mostrarSecao('pedidos')">📦 Pedidos Recentes</button>
+        </div>
+
+        <!-- Dashboard -->
+        <section id="dashboard" class="admin-section active">
+            <div class="dashboard-cards">
+                <div class="dash-card">
+                    <h3>📦 Total de Pedidos (Hoje)</h3>
+                    <div class="value" id="dash-pedidos-hoje">0</div>
+                    <div class="trend up" id="dash-pedidos-trend">↑ 0% vs ontem</div>
+                </div>
+                <div class="dash-card">
+                    <h3>💰 Faturamento (Hoje)</h3>
+                    <div class="value" id="dash-faturamento">R$ 0,00</div>
+                    <div class="trend up" id="dash-fat-trend">↑ 0% vs ontem</div>
+                </div>
+                <div class="dash-card">
+                    <h3>👥 Clientes Ativos</h3>
+                    <div class="value" id="dash-clientes">0</div>
+                    <div class="trend">Este mês</div>
+                </div>
+                <div class="dash-card">
+                    <h3>🟢 Status da Loja</h3>
+                    <div class="value" id="dash-status-loja">Aberta</div>
+                    <div class="trend">Atualizado agora</div>
+                </div>
+            </div>
+
+            <div class="logs-table">
+                <h3>⚡ Últimas Atividades</h3>
+                <div class="logs-list" id="atividades-recentes">
+                    <!-- Atividades serão carregadas aqui -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Logs -->
+        <section id="logs" class="admin-section">
+            <div class="logs-table">
+                <h3>📋 Todos os Logs de Atividades</h3>
+                <div class="logs-list" id="todos-logs">
+                    <!-- Logs completos serão carregados aqui -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Farmacêuticos -->
+        <section id="farmaceuticos" class="admin-section">
+            <div class="farmaceuticos-grid" id="farmaceuticos-grid">
+                <!-- Cards dos farmacêuticos serão carregados aqui -->
+            </div>
+        </section>
+
+        <!-- Vendas -->
+        <section id="vendas" class="admin-section">
+            <div class="vendas-chart">
+                <h3>📊 Vendas dos Últimos 7 Dias</h3>
+                <div class="chart-bars" id="vendas-chart">
+                    <!-- Gráfico será gerado aqui -->
+                </div>
+            </div>
+            <div class="logs-table">
+                <h3>💰 Relatório de Vendas</h3>
+                <div class="logs-list" id="relatorio-vendas">
+                    <!-- Relatório de vendas -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Pedidos Recentes -->
+        <section id="pedidos" class="admin-section">
+            <div class="recent-pedidos">
+                <h3>📦 Últimos 20 Pedidos</h3>
+                <div class="pedido-row header">
+                    <span>ID</span>
+                    <span>Cliente</span>
+                    <span>Status</span>
+                    <span>Total</span>
+                    <span>Data</span>
+                </div>
+                <div id="pedidos-list">
+                    <!-- Lista de pedidos -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Lista de farmacêuticos
+        const farmaceuticosCadastrados = [
+            { codigo: 'FAR001', nome: 'Dr. André', senha: '123456' },
+            { codigo: 'FAR002', nome: 'Dra. Maria', senha: '123456' },
+            { codigo: 'FAR003', nome: 'Dr. João', senha: '123456' },
+            { codigo: 'ADMIN', nome: 'Administrador', senha: 'admin123' }
+        ];
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDashboard();
+            carregarLogs();
+            carregarFarmaceuticos();
+            carregarVendas();
+            carregarPedidosRecentes();
+            
+            // Atualizar automaticamente a cada 3 segundos
+            setInterval(() => {
+                carregarDashboard();
+                carregarLogs();
+                carregarFarmaceuticos();
+                carregarVendas();
+                carregarPedidosRecentes();
+            }, 3000);
+            
+            // Escutar mudanças no localStorage
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'pedidosFarmacia' || e.key === 'logsFarmacia' || e.key === 'lojaAbertaFarmacia') {
+                    carregarDashboard();
+                    carregarLogs();
+                    carregarFarmaceuticos();
+                    carregarVendas();
+                    carregarPedidosRecentes();
+                }
+            });
+        });
+
+        function mostrarSecao(secao) {
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.admin-nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(secao).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function carregarDashboard() {
+            const pedidos = JSON.parse(localStorage.getItem('pedidosFarmacia') || '[]');
+            const hoje = new Date().toDateString();
+            
+            const pedidosHoje = pedidos.filter(p => new Date(p.dataPedido).toDateString() === hoje);
+            const faturamentoHoje = pedidosHoje.reduce((sum, p) => {
+                const total = parseFloat(p.total.replace('R$ ', '').replace(',', '.'));
+                return sum + (isNaN(total) ? 0 : total);
+            }, 0);
+            
+            const clientesUnicos = new Set(pedidos.map(p => p.cpf)).size;
+            const lojaAberta = localStorage.getItem('lojaAbertaFarmacia') !== 'false';
+            
+            document.getElementById('dash-pedidos-hoje').textContent = pedidosHoje.length;
+            document.getElementById('dash-faturamento').textContent = `R$ ${faturamentoHoje.toFixed(2).replace('.', ',')}`;
+            document.getElementById('dash-clientes').textContent = clientesUnicos;
+            document.getElementById('dash-status-loja').textContent = lojaAberta ? '🟢 Aberta' : '🔴 Fechada';
+        }
+
+        function carregarLogs() {
+            const logs = JSON.parse(localStorage.getItem('logsFarmacia') || '[]');
+            const containerRecentes = document.getElementById('atividades-recentes');
+            const containerTodos = document.getElementById('todos-logs');
+            
+            const logsRecentes = logs.slice(-10).reverse();
+            
+            containerRecentes.innerHTML = logsRecentes.map(log => criarLogItem(log)).join('');
+            containerTodos.innerHTML = logs.slice().reverse().map(log => criarLogItem(log)).join('');
+        }
+
+        function criarLogItem(log) {
+            const iconMap = {
+                'pedido': { icon: '📦', class: 'pedido' },
+                'farmaceutico': { icon: '👨‍⚕️', class: 'farmaceutico' },
+                'loja': { icon: '🏪', class: 'loja' },
+                'sistema': { icon: '⚙️', class: 'sistema' }
+            };
+            
+            const info = iconMap[log.tipo] || iconMap['sistema'];
+            
+            return `
+                <div class="log-item">
+                    <div class="log-icon ${info.class}">${info.icon}</div>
+                    <div class="log-content">
+                        <div class="title">${log.titulo}</div>
+                        <div class="details">${log.detalhes}</div>
+                    </div>
+                    <div class="log-time">${formatarDataLog(log.data)}</div>
+                </div>
+            `;
+        }
+
+        function formatarDataLog(dataISO) {
+            const data = new Date(dataISO);
+            const agora = new Date();
+            const diffMs = agora - data;
+            const diffMin = Math.floor(diffMs / 60000);
+            
+            if (diffMin < 1) return 'Agora';
+            if (diffMin < 60) return `há ${diffMin}min`;
+            
+            const diffHoras = Math.floor(diffMin / 60);
+            if (diffHoras < 24) return `há ${diffHoras}h`;
+            
+            return data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+        }
+
+        function carregarFarmaceuticos() {
+            const pedidos = JSON.parse(localStorage.getItem('pedidosFarmacia') || '[]');
+            const container = document.getElementById('farmaceuticos-grid');
+            
+            container.innerHTML = farmaceuticosCadastrados.map(far => {
+                const pedidosPreparados = pedidos.filter(p => p.farmaceuticoPreparacao === far.codigo).length;
+                const pedidosDespachados = pedidos.filter(p => p.farmaceuticoDespacho === far.codigo).length;
+                const totalAcoes = pedidosPreparados + pedidosDespachados;
+                
+                return `
+                    <div class="farmaceutico-card">
+                        <div class="farmaceutico-header">
+                            <div class="farmaceutico-avatar">${far.nome.charAt(0)}</div>
+                            <div class="farmaceutico-info">
+                                <h3>${far.nome}</h3>
+                                <span class="codigo">${far.codigo}</span>
+                            </div>
+                        </div>
+                        <div class="farmaceutico-stats">
+                            <div class="fs-stat">
+                                <div class="number">${pedidosPreparados}</div>
+                                <div class="label">Preparados</div>
+                            </div>
+                            <div class="fs-stat">
+                                <div class="number">${pedidosDespachados}</div>
+                                <div class="label">Despachados</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function carregarVendas() {
+            const pedidos = JSON.parse(localStorage.getItem('pedidosFarmacia') || '[]');
+            const container = document.getElementById('vendas-chart');
+            const relatorio = document.getElementById('relatorio-vendas');
+            
+            // Últimos 7 dias
+            const dias = [];
+            for (let i = 6; i >= 0; i--) {
+                const data = new Date();
+                data.setDate(data.getDate() - i);
+                dias.push(data);
+            }
+            
+            const vendasPorDia = dias.map(data => {
+                const dataStr = data.toDateString();
+                const pedidosDia = pedidos.filter(p => new Date(p.dataPedido).toDateString() === dataStr);
+                const total = pedidosDia.reduce((sum, p) => {
+                    const v = parseFloat(p.total.replace('R$ ', '').replace(',', '.'));
+                    return sum + (isNaN(v) ? 0 : v);
+                }, 0);
+                return { data, total, pedidos: pedidosDia.length };
+            });
+            
+            const maxTotal = Math.max(...vendasPorDia.map(v => v.total), 100);
+            
+            container.innerHTML = vendasPorDia.map(v => {
+                const altura = (v.total / maxTotal) * 100;
+                return `
+                    <div class="chart-bar" style="height: ${Math.max(altura, 2)}%">
+                        <span class="bar-value">R$${v.total.toFixed(0)}</span>
+                        <span class="bar-label">${v.data.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'})}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            // Relatório
+            const totalGeral = vendasPorDia.reduce((sum, v) => sum + v.total, 0);
+            const totalPedidos = vendasPorDia.reduce((sum, v) => sum + v.pedidos, 0);
+            
+            relatorio.innerHTML = `
+                <div class="log-item">
+                    <div class="log-icon sistema">💰</div>
+                    <div class="log-content">
+                        <div class="title">Faturamento Total (7 dias)</div>
+                        <div class="details">R$ ${totalGeral.toFixed(2).replace('.', ',')} em ${totalPedidos} pedidos</div>
+                    </div>
+                </div>
+                ${vendasPorDia.map(v => `
+                    <div class="log-item">
+                        <div class="log-icon pedido">📅</div>
+                        <div class="log-content">
+                            <div class="title">${v.data.toLocaleDateString('pt-BR')}</div>
+                            <div class="details">${v.pedidos} pedidos | R$ ${v.total.toFixed(2).replace('.', ',')}</div>
+                        </div>
+                    </div>
+                `).reverse().join('')}
+            `;
+        }
+
+        function carregarPedidosRecentes() {
+            const pedidos = JSON.parse(localStorage.getItem('pedidosFarmacia') || '[]');
+            const container = document.getElementById('pedidos-list');
+            
+            const statusMap = {
+                'pendente': { text: 'Pendente', class: 'pendente' },
+                'preparando': { text: 'Preparando', class: 'preparando' },
+                'pronto': { text: 'Pronto', class: 'pronto' },
+                'saindo_entrega': { text: 'Saindo', class: 'saindo' },
+                'entregue': { text: 'Entregue', class: 'entregue' }
+            };
+            
+            const ultimos20 = pedidos.slice(0, 20);
+            
+            container.innerHTML = ultimos20.map(p => {
+                const status = statusMap[p.status] || statusMap['pendente'];
+                const data = new Date(p.dataPedido).toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'});
+                
+                return `
+                    <div class="pedido-row">
+                        <span style="font-weight: 600; color: var(--primary-color);">${p.id}</span>
+                        <span>${p.nome}</span>
+                        <span><span class="status-dot ${status.class}"></span>${status.text}</span>
+                        <span style="font-weight: 600;">${p.total}</span>
+                        <span style="color: var(--text-light); font-size: 0.85rem;">${data}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>
