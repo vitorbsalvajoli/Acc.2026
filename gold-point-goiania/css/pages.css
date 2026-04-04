@@ -1,0 +1,120 @@
+/* ============================================
+   Gold Point Goiânia - Estilos para Páginas Internas
+   ============================================ */
+
+/* Page Content */
+.page-content {
+    padding-top: 140px;
+    padding-bottom: 80px;
+    min-height: calc(100vh - 200px);
+}
+
+/* Page Header */
+.page-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    color: var(--preto);
+    margin-bottom: 10px;
+    position: relative;
+    display: inline-block;
+}
+
+.page-header h1::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--ouro-principal), var(--ouro-escuro));
+    margin: 15px auto 0;
+    border-radius: 2px;
+}
+
+.page-header p {
+    color: var(--cinza);
+    font-size: 1rem;
+}
+
+/* Content Box */
+.content-box {
+    background: var(--branco);
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: var(--sombra);
+    border: 1px solid var(--cinza-claro);
+    margin-bottom: 40px;
+}
+
+.content-box h2 {
+    text-align: left;
+    font-size: 1.3rem;
+    color: var(--preto);
+    margin-top: 30px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--ouro-principal);
+}
+
+.content-box h2:first-of-type {
+    margin-top: 0;
+}
+
+.content-box p {
+    color: var(--cinza-escuro);
+    line-height: 1.8;
+    margin-bottom: 15px;
+}
+
+.content-box ul,
+.content-box ol {
+    margin-left: 25px;
+    margin-bottom: 15px;
+}
+
+.content-box li {
+    color: var(--cinza-escuro);
+    line-height: 1.8;
+    margin-bottom: 10px;
+}
+
+.content-box strong {
+    color: var(--preto);
+}
+
+/* Page Navigation */
+.page-nav {
+    text-align: center;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .page-content {
+        padding-top: 120px;
+        padding-bottom: 40px;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .content-box {
+        padding: 30px 20px;
+    }
+
+    .content-box h2 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .content-box {
+        padding: 20px 15px;
+    }
+}
